@@ -37,6 +37,7 @@ iOS可尝试使用第三方python IDE，并添加pip install requests beautifuls
 1. 如提示缺少configparser，尝试安装pip install configparser (尽管是Python标准库，但在某些Python版本中可能需要手动安装)<br />
 2. kivy中的popup可能没有很好的实现文字对话框左对齐，Windows下应该没问题，其他平台暂时没找到可行方法(详见使用说明2)<br />
 3. 如需替换字体，请复制字体到脚本根目录并更改font_filename = "字体名.后缀名"后使用/打包<br />
+4. 内藏一个彩蛋，可在程序中打开，包含历史版本说明(试读源码找找吧)<br />
 
 
 ## 感谢名单：
