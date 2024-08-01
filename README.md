@@ -16,6 +16,10 @@
 *软件bug、解析错误请提交issue(可以的话可附上过程描述、debug信息、版本号等(其中flickbili_xx_debug.exe版包含更详尽的debug信息))<br />
 
 
+## 界面截图
+![image](https://github.com/Yamada-da/flickbili/blob/main/Screenshot/Screenshot.png)
+
+
 ## 隐私说明：
 1. 如同浏览器无痕模式，flickbili软件旨在：<br />
 -不记录您的任何信息（除手动输入保存在本地的纯k解析前缀配置文件）<br />
