@@ -247,7 +247,7 @@ class ClipboardApp(App):
                             print("<<<DEBUG>>>yangkeduo.com处理：", self.processed_url)
 
                     # Special handling for m.tb.cn URLs (update e.tb.cn_24.9.25)
-                    elif 'm.tb.cn' or 'e.tb.cn' in self.original_url:
+                    elif any(domain in self.original_url for domain in ['m.tb.cn', 'e.tb.cn']):
                         lines = response.text.splitlines()
                         found_var_url = False
                         for line in lines:
