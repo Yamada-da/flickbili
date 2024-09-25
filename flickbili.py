@@ -137,7 +137,7 @@ class ClipboardApp(App):
         self.layout.add_widget(self.exit_button)
 
         self.easter_egg_button = Button(
-            text=f'这个是版本号 0.9.3 ({platform.system()})',
+            text=f'这个是版本号 0.9.4 ({platform.system()})',
             background_color=(0, 0, 0, 1),  # 黑色背景
             color=(0.3, 0.3, 0.3, 1),  # 灰色文字
             size_hint_y=None,
@@ -246,8 +246,8 @@ class ClipboardApp(App):
                             self.processed_url = f"https://mobile.yangkeduo.com/goods.html?goods_id={goods_id}"
                             print("<<<DEBUG>>>yangkeduo.com处理：", self.processed_url)
 
-                    # Special handling for m.tb.cn URLs
-                    elif 'm.tb.cn' in self.original_url:
+                    # Special handling for m.tb.cn URLs (update e.tb.cn_24.9.25)
+                    elif 'm.tb.cn' or 'e.tb.cn' in self.original_url:
                         lines = response.text.splitlines()
                         found_var_url = False
                         for line in lines:
@@ -651,6 +651,7 @@ class ClipboardApp(App):
 \n---2024.7.19 v.0.9.2---\n修复删减代码后纯k逻辑错误\n修复bili视频实际地址部分按钮闪退
 \n---2024.7.20 v.0.9.3---\n调整了Windows下的缩放\n调整纯k按钮长按为1.25秒
 \n---2024.7.31 v.0.9.3---\n没有升级(版本号)程序\n开源前精简冗余注释\n调整了Debug内容输出
+\n---2024.7.31 v.0.9.4---\n更新了淘宝解析
 ----------------------------
 本程序(除iOS)内嵌SourceHanSansSC字体\n该字体遵循OFL-1.1许可\n程序使用kivy库实现跨平台运行""", 
                             halign='center', valign='middle', color=(0.65, 0.65, 0.65, 1), size_hint_y=None)
