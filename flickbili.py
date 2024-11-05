@@ -137,7 +137,7 @@ class ClipboardApp(App):
         self.layout.add_widget(self.exit_button)
 
         self.easter_egg_button = Button(
-            text=f'这个是版本号 0.9.4 ({platform.system()})',
+            text=f'这个是版本号 0.9.5 ({platform.system()})',
             background_color=(0, 0, 0, 1),  # 黑色背景
             color=(0.3, 0.3, 0.3, 1),  # 灰色文字
             size_hint_y=None,
@@ -187,7 +187,7 @@ class ClipboardApp(App):
             url = urls[0]
             try:
                 headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
                 }
                 response = self.fetch_url_with_redirects(url, headers)
 
@@ -246,26 +246,65 @@ class ClipboardApp(App):
                             self.processed_url = f"https://mobile.yangkeduo.com/goods.html?goods_id={goods_id}"
                             print("<<<DEBUG>>>yangkeduo.com处理：", self.processed_url)
 
-                    # Special handling for m.tb.cn URLs (update e.tb.cn_24.9.25)
+                    # # Special handling for m.tb.cn URLs (update e.tb.cn_24.9.25)
+                    # elif any(domain in self.original_url for domain in ['m.tb.cn', 'e.tb.cn']):
+                    #     lines = response.text.splitlines()
+                    #     found_var_url = False
+                    #     for line in lines:
+                    #         if 'var url =' in line:
+                    #             start_index = line.find('id=')
+                    #             if start_index != -1:
+                    #                 end_index = line.find('&', start_index)
+                    #                 if end_index != -1:
+                    #                     id_value = line[start_index + 3:end_index]
+                    #                     self.processed_url = f'https://item.taobao.com/item.htm?id={id_value}'
+                    #                     print("<<<DEBUG>>>m.tb.cn处理：", self.processed_url)
+                    #                     found_var_url = True
+                    #                     break
+
+                    #     if not found_var_url:
+                    #         error_label_text = "原始链接获取失败，可能是商品链接失效\n或是淘宝更新了代码，请尝试查找软件更新"
+                    #         process_error = 1
+                    #         print("未找到 'var url =' 值，可能淘宝已更新代码，请寻求软件更新")
+
+                    # Special handling for m.tb.cn URLs (update 24.11.5)
                     elif any(domain in self.original_url for domain in ['m.tb.cn', 'e.tb.cn']):
                         lines = response.text.splitlines()
                         found_var_url = False
                         for line in lines:
-                            if 'var url =' in line:
-                                start_index = line.find('id=')
+                            # Check if the line contains 'https://shop' before checking 'id='
+                            if 'https://shop' in line:
+                                start_index = line.find('https://shop')  # 找到 'https://shop' 的起始位置
+                                print('此链接为店铺链接')
                                 if start_index != -1:
-                                    end_index = line.find('&', start_index)
-                                    if end_index != -1:
-                                        id_value = line[start_index + 3:end_index]
-                                        self.processed_url = f'https://item.taobao.com/item.htm?id={id_value}'
-                                        print("<<<DEBUG>>>m.tb.cn处理：", self.processed_url)
-                                        found_var_url = True
-                                        break
+                                    end_index = line.find('?', start_index)  # 找到第一个问号的位置
+                                    if end_index == -1:  # 如果没有问号，直接取到行尾
+                                        print('店铺链接撰写方式可能已改变')
+                                        error_label_text = '此链接为店铺地址，但可能未能提取脱敏链接，请检查或GitHub查找更新'
+                                        end_index = len(line)
+                                    shop_url = line[start_index:end_index]  # 截取到第一个问号前的部分
+                                    self.processed_url = shop_url
+                                    print("<<<DEBUG>>> Shop URL found: ", self.processed_url)
+                                    found_var_url = True
+                                    break
+                            else:
+                                # Only execute this block if 'https://shop' is not found
+                                if 'var url =' in line:
+                                    start_index = line.find('id=')
+                                    if start_index != -1:
+                                        end_index = line.find('&', start_index)
+                                        if end_index != -1:
+                                            id_value = line[start_index + 3:end_index]
+                                            self.processed_url = f'https://item.taobao.com/item.htm?id={id_value}'
+                                            print("<<<DEBUG>>> m.tb.cn处理：", self.processed_url)
+                                            found_var_url = True
+                                            break
 
                         if not found_var_url:
-                            error_label_text = "原始链接获取失败，可能是商品链接失效\n或是淘宝更新了代码，请尝试查找软件更新"
+                            error_label_text = "原始链接获取失败，可能是商品链接失效\n或是淘宝更新了代码，请尝试GitHub查找软件更新"
                             process_error = 1
                             print("未找到 'var url =' 值，可能淘宝已更新代码，请寻求软件更新")
+
 
                     # Special handling for taobao URLs
                     elif 'taobao.com' in self.original_url:
@@ -315,6 +354,22 @@ class ClipboardApp(App):
                             id = match.group(1)
                             self.processed_url = f"https://show.bilibili.com/platform/detail.html?id={id}"
                             print("<<<DEBUG>>>show.bilibili.com处理：", self.processed_url)
+
+                    # Special handling for trade.m.jd.com URLs (update 24.11.4)
+                    elif 'trade.m.jd.com' in self.original_url:
+                        match = re.search(r'product/(\d+)', self.original_url)
+                        if match:
+                            product_id = match.group(1)
+                            self.processed_url = f"https://item.jd.com/{product_id}.html"
+                            print("<<<DEBUG>>> trade.m.jd.com处理：", self.processed_url)
+
+                    # Special handling for shop.m.jd.com URLs (update 24.11.4)
+                    elif 'shop.m.jd.com' in self.original_url:
+                        match = re.search(r'shopId=(\d+)', self.original_url)
+                        if match:
+                            shopId = match.group(1)
+                            self.processed_url = f"https://mall.jd.com/index-{shopId}.html"
+                            print("<<<DEBUG>>> shop.m.jd.com处理：", self.processed_url)
                     
 
                     else:
@@ -651,7 +706,8 @@ class ClipboardApp(App):
 \n---2024.7.19 v.0.9.2---\n修复删减代码后纯k逻辑错误\n修复bili视频实际地址部分按钮闪退
 \n---2024.7.20 v.0.9.3---\n调整了Windows下的缩放\n调整纯k按钮长按为1.25秒
 \n---2024.7.31 v.0.9.3---\n没有升级(版本号)程序\n开源前精简冗余注释\n调整了Debug内容输出
-\n---2024.7.31 v.0.9.4---\n更新了淘宝解析
+\n---2024.9.25 v.0.9.4---\n更新了淘宝解析
+\n---2024.11.5 v.0.9.5---\n添加了淘宝店铺链接解析，修复京东解析
 ----------------------------
 本程序(除iOS)内嵌SourceHanSansSC字体\n该字体遵循OFL-1.1许可\n程序使用kivy库实现跨平台运行""", 
                             halign='center', valign='middle', color=(0.65, 0.65, 0.65, 1), size_hint_y=None)
