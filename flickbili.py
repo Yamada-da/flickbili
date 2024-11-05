@@ -246,27 +246,6 @@ class ClipboardApp(App):
                             self.processed_url = f"https://mobile.yangkeduo.com/goods.html?goods_id={goods_id}"
                             print("<<<DEBUG>>>yangkeduo.com处理：", self.processed_url)
 
-                    # # Special handling for m.tb.cn URLs (update e.tb.cn_24.9.25)
-                    # elif any(domain in self.original_url for domain in ['m.tb.cn', 'e.tb.cn']):
-                    #     lines = response.text.splitlines()
-                    #     found_var_url = False
-                    #     for line in lines:
-                    #         if 'var url =' in line:
-                    #             start_index = line.find('id=')
-                    #             if start_index != -1:
-                    #                 end_index = line.find('&', start_index)
-                    #                 if end_index != -1:
-                    #                     id_value = line[start_index + 3:end_index]
-                    #                     self.processed_url = f'https://item.taobao.com/item.htm?id={id_value}'
-                    #                     print("<<<DEBUG>>>m.tb.cn处理：", self.processed_url)
-                    #                     found_var_url = True
-                    #                     break
-
-                    #     if not found_var_url:
-                    #         error_label_text = "原始链接获取失败，可能是商品链接失效\n或是淘宝更新了代码，请尝试查找软件更新"
-                    #         process_error = 1
-                    #         print("未找到 'var url =' 值，可能淘宝已更新代码，请寻求软件更新")
-
                     # Special handling for m.tb.cn URLs (update 24.11.5)
                     elif any(domain in self.original_url for domain in ['m.tb.cn', 'e.tb.cn']):
                         lines = response.text.splitlines()
